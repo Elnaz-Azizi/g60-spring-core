@@ -39,24 +39,13 @@ public class WalletServiceImpl implements WalletService {
 
         Wallet wallet = walletDao.findById(walletId)
                 .orElseThrow(() -> new IllegalArgumentException(walletId));
-        //OPTIONAL to use @Value
-        // Check maximum deposit limit
+
         BigDecimal maximumDeposit = new BigDecimal("1000000");
 
         if (amount.compareTo(maximumDeposit) > 0) {
             throw new IllegalArgumentException(
                     "Deposit amount exceeds maximum limit of " + maximumDeposit);
         }
-
-        /*
-        The `compareTo()` method returns:
-        - `-1` if the first number is less than the second
-        - `0` if they are equal
-        - `1` if the first number is greater than the second
-
-        `> 0` checks if the comparison result is positive (meaning the amount is greater than the maximum)
-
-         */
 
         wallet.deposit(amount);
         walletDao.update(wallet);
