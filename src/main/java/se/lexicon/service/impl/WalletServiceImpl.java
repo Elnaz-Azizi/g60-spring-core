@@ -1,5 +1,6 @@
 package se.lexicon.service.impl;
 
+import se.lexicon.config.WalletLimitConfig;
 import se.lexicon.dao.TransactionDao;
 import se.lexicon.dao.WalletDao;
 import se.lexicon.model.Transaction;
@@ -14,12 +15,14 @@ public class WalletServiceImpl implements WalletService {
 
     private WalletDao walletDao;
     private TransactionDao transactionDao;
+    private WalletLimitConfig walletLimitConfig = new WalletLimitConfig();
 
 
 
-    public WalletServiceImpl(WalletDao walletDao, TransactionDao transactionDao) {
+    public WalletServiceImpl(WalletDao walletDao, TransactionDao transactionDao, WalletLimitConfig walletLimitConfig) {
         this.walletDao = walletDao;
         this.transactionDao = transactionDao;
+        this.walletLimitConfig = walletLimitConfig;
     }
 
 
@@ -40,11 +43,16 @@ public class WalletServiceImpl implements WalletService {
         Wallet wallet = walletDao.findById(walletId)
                 .orElseThrow(() -> new IllegalArgumentException(walletId));
 
-        BigDecimal maximumDeposit = new BigDecimal("1000000");
+      /*  BigDecimal maximumDeposit = new BigDecimal("1000000");
 
         if (amount.compareTo(maximumDeposit) > 0) {
             throw new IllegalArgumentException(
                     "Deposit amount exceeds maximum limit of " + maximumDeposit);
+        }*/
+
+        if (amount.compareTo(walletLimitConfig.getMaxDeposit()) > 0) {
+            throw new IllegalArgumentException(
+                    "Deposit amount exceeds maximum limit of " + walletLimitConfig.getMaxDeposit());
         }
 
         wallet.deposit(amount);
